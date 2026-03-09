@@ -131,6 +131,14 @@ margin-left:-25px;
 
 <script>
 
+var password = prompt("Enter Student Password");
+
+if(password !== "Student46!22F"){
+alert("Access Denied");
+window.location="index.html";
+}
+
+
 function togglePassword(id){
 
 let p=document.getElementById(id);
@@ -258,4 +266,5 @@ table.innerHTML+=`
 </script>
 
 </body>
+
 </html>
