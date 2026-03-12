@@ -9,7 +9,8 @@
 <style>
 
 body{
-font-family:Arial;
+font-family:Calibri, Arial, sans-serif;
+font-weight:bold;
 background:#f4f6f9;
 margin:0;
 }
@@ -116,6 +117,7 @@ margin-left:-25px;
 <th>Week</th>
 <th>Year</th>
 <th>Email</th>
+<th>Date Issued & Timestamp</th>
 </tr>
 
 <tbody id="table"></tbody>
@@ -139,6 +141,35 @@ alert("Access Denied");
 window.location="index.html";
 }*/
 
+
+
+
+/* AUTO LOGOUT AFTER 30 MINUTES */
+
+let logoutTimer;
+
+function startLogoutTimer(){
+
+clearTimeout(logoutTimer);
+
+logoutTimer=setTimeout(function(){
+
+alert("Session expired. Please login again.");
+
+localStorage.removeItem("studentLogin");
+
+location.reload();
+
+},1800000);
+
+}
+
+document.addEventListener("click",startLogoutTimer);
+document.addEventListener("keypress",startLogoutTimer);
+document.addEventListener("mousemove",startLogoutTimer);
+
+
+
 function togglePassword(id){
 
 let p=document.getElementById(id);
@@ -159,13 +190,15 @@ return pattern.test(email);
 
 window.onload=function(){
 
-if(sessionStorage.getItem("studentLogin")=="true"){
+let savedEmail=localStorage.getItem("studentEmail");
+let savedPass=localStorage.getItem("studentPass");
 
-document.getElementById("loginPage").style.display="none";
-document.getElementById("studentView").classList.remove("hidden");
+if(savedEmail){
+document.getElementById("loginEmail").value=savedEmail;
+}
 
-loadStudent();
-
+if(savedPass){
+document.getElementById("loginPassword").value=savedPass;
 }
 
 }
@@ -213,12 +246,15 @@ return;
 }
 
 sessionStorage.setItem("studentLogin","true");
-sessionStorage.setItem("studentEmail",email); // SAVE EMAIL
+
+localStorage.setItem("studentEmail",email);
+localStorage.setItem("studentPass",pass);  // ADD THIS LINE
 
 document.getElementById("loginPage").style.display="none";
 document.getElementById("studentView").classList.remove("hidden");
 
 loadStudent();
+startLogoutTimer();
 
 }
 
@@ -226,7 +262,7 @@ loadStudent();
 
 function loadStudent(){
 
-let email=sessionStorage.getItem("studentEmail"); // GET STORED EMAIL
+let email=localStorage.getItem("studentEmail");
 
 let enrollments=JSON.parse(localStorage.getItem("enrollments"))||[];
 
@@ -238,7 +274,7 @@ let filtered=enrollments.filter(e=>e.email===email);
 
 if(filtered.length===0){
 
-table.innerHTML="<tr><td colspan='7'>No Data</td></tr>";
+table.innerHTML="<tr><td colspan='8'>No Data</td></tr>";
 return;
 
 }
@@ -255,6 +291,7 @@ table.innerHTML+=`
 <td>${e.week}</td>
 <td>${e.year}</td>
 <td>${e.email}</td>
+<td>${e.timestamp}</td>
 </tr>
 
 `;
